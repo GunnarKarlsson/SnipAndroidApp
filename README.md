@@ -9,7 +9,7 @@ This project aims to provide an Android client for the snipplr.com website. Snip
  * Choose between small, medium or large font size.
  * Switch to white text on black background for extra contrast.
 
-![Screen shots](https://github.com/GunnarKarlsson/Snip/screenShotPanel.png)
+![Screen shots](https://github.com/GunnarKarlsson/Snip/raw/master/screenShots.png)
 
 ## Background
 
