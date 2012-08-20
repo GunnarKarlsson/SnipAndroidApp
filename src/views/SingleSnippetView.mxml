@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		creationComplete="creationCompleteHandler(event)" xmlns:components="components.*"
+		destructionPolicy="never">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace views "views.*";
+		@namespace components "components.*";
+		.textAreaStyle{
+			font-size:24;
+			color: black;
+			contentBackgroundColor: white;
+		}
+		
+	</fx:Style>
+	
+	<!--<s:navigationContent>
+		<s:Image source="@Embed('assets/images/SNIP.png')"/>
+	</s:navigationContent>-->
+	<s:actionContent >
+		<!--<s:Button includeIn="snippetFoundState" icon="@Embed('assets/images/enlargeIcon.png')" click="onClickEnlarge(event)"/>-->
+		<s:Button icon="@Embed('assets/images/icons/codeView/blackTextIcon.png')" click="setTextColor('black')"/> 
+		<s:Button icon="@Embed('assets/images/icons/codeView/whiteTextIcon.png')" click="setTextColor('white')"/> 
+		<s:Button icon="@Embed('assets/images/icons/codeView/smallTextIcon.png')" click="setFont(16)"/>
+		<s:Button icon="@Embed('assets/images/icons/codeView/mediumTextIcon.png')" click="setFont(24)"/> 
+		<s:Button icon="@Embed('assets/images/icons/codeView/largeTextIcon.png')" click="setFont(36)"/>
+		<s:Button includeIn="snippetFoundState,noSnippetFoundState" icon="@Embed('assets/images/menuLightGrey.png')" click="popup.show()"/>
+	</s:actionContent>
+	
+	<s:states>
+		<s:State name="requestingSnippetState"/>
+		<s:State name="noSnippetFoundState"/>
+		<s:State name="snippetFoundState"/>
+	</s:states>
+	
+	<fx:Script>
+		<![CDATA[
+			import VOs.SnippetVO;
+			
+			import com.mattism.http.xmlrpc.ConnectionImpl;
+			import com.mattism.http.xmlrpc.MethodFault;
+			import com.mattism.http.xmlrpc.util.XMLRPCDataTypes;
+			
+			import components.MenuPopUp;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.utils.ArrayUtil;
+			
+			private var _rpc:ConnectionImpl;
+			
+			[Bindable]
+			private var popup:MenuPopUp;
+			
+			[Bindable]
+			private var _vo:SnippetVO;
+			
+			[Bindable]
+			private var _lineBreakState:String = "explicit";
+			
+			[Bindable]
+			private var _textColor:int = 0x000000;
+			
+			[Bindable]
+			private var _textAreaWidth:int = FlexGlobals.topLevelApplication.navigator.width-20;
+			[Bindable]
+			private var _textAreaHeight:int;
+			[Bindable]
+			private var _snippetName:String = "Loading your snippet";
+			[Bindable]
+			private var _language:String = "";
+			
+			private function creationCompleteHandler(event:FlexEvent):void{
+				
+				currentState="requestingSnippetState";
+				
+				popup = new MenuPopUp();
+				
+				var snippetId:String = data.id;
+				
+				_rpc = new ConnectionImpl('http://snipplr.com/xml-rpc.php');
+				_rpc.addEventListener(Event.COMPLETE, rpcCompleteHandler);
+				_rpc.addEventListener(ErrorEvent.ERROR, rpcErrorHandler);
+				_rpc.addParam(snippetId, XMLRPCDataTypes.STRING);
+				_rpc.call('snippet.get');
+				
+			}
+			
+			private function rpcErrorHandler(evt:ErrorEvent):void
+			{
+				var fault:MethodFault = _rpc.getFault();
+				currentState = "noSnippetFoundState";
+				_snippetName ="";
+			}
+			
+			private function rpcCompleteHandler(evt:Event):void
+			{
+				currentState="snippetFoundState";
+				_textAreaHeight = FlexGlobals.topLevelApplication.navigator.height-300;
+				
+				var response:Object = _rpc.getResponse();
+				
+				if(response.source==null)trace("source null");
+				
+				_vo = new SnippetVO();
+				_vo.user_id = response.user_id;
+				_vo.username = response.username;
+				_vo.title = response.title;
+				_vo.language = response.language;
+				_vo.comment = response.comment;
+				_vo.created = response.created;
+				_vo.source = toHtml(response.source);
+				_vo.snipplr_url = response.snipplr_url;
+				_vo.tags = response.tags;
+				
+				_snippetName = response.title;
+				_language = response.language;
+			}
+			
+			private function toHtml(myString:String):String{
+				var htmlString:String = myString.split("&lt;").join("<");
+				htmlString = htmlString.split("&gt;").join(">");
+				htmlString = htmlString.split("&quot;").join("\"");
+				htmlString = htmlString.split("&apos;").join("\'");
+				return htmlString;
+			}
+			
+			private function setTextColor(color:String):void{
+				var style:CSSStyleDeclaration = new CSSStyleDeclaration();
+				if(color=="black"){
+					style.setStyle("color","black");
+					style.setStyle("contentBackgroundColor","white");
+				}else{
+					style.setStyle("color","white");
+					style.setStyle("contentBackgroundColor","black");				
+				}
+				styleManager.setStyleDeclaration(".textAreaStyle",style,true);	
+			}
+			
+			private function setFont(size:int):void{
+				var style:CSSStyleDeclaration = new CSSStyleDeclaration();
+				style.setStyle("fontSize",size);
+				styleManager.setStyleDeclaration(".textAreaStyle",style,true);
+			}
+		]]>
+	</fx:Script>
+	
+	<s:VGroup width="100%" height="100%">
+		<s:SkinnableContainer id="header" width="100%" skinClass="skins.BlackBoxSkin" top="0" left="0" height="60">
+			<s:VGroup left="10" top="10" gap="5" >			
+				<s:Label id="snippetName" text="{_snippetName}" fontSize="24" color="0xffffff"/>
+				<s:Label id="languageLabel" text="{_language}" fontSize="18" color="0xcccccc"/>
+			</s:VGroup>
+		</s:SkinnableContainer>
+		
+		<s:TextArea id="codeTextArea" styleName="textAreaStyle" width="100%" height="100%" includeIn="snippetFoundState" text="{_vo.source}" 
+					editable="false" selectable="false" lineBreak="explicit" borderVisible="false"/>
+		
+	</s:VGroup>
+
+	
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~requestingState~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	
+	<s:VGroup includeIn="requestingSnippetState" verticalCenter="0" horizontalCenter="0" horizontalAlign="center" verticalAlign="middle">
+		<s:BusyIndicator scaleX="3" scaleY="3"/>
+		<s:Label text="requesting snippet"/>
+	</s:VGroup>
+	
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~noSnippetFoundState~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	
+	<s:VGroup includeIn="noSnippetFoundState" verticalCenter="0" horizontalCenter="0">
+		<s:Image source="@Embed('assets/images/exclamation.png')"/>
+		<s:Label text="No snippet details found."/>
+		<s:Label text="Please note that snippets marked Private"/>
+		<s:Label text="on Snipplr.com can't be retrieved."/>
+	</s:VGroup>
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~end states~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+</s:View>

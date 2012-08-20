@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark"
+							creationComplete="creationCompleteHandler(event)"
+				
+							splashScreenImage="@Embed('assets/images/splashScreenLP.png')"
+							splashScreenMinimumDisplayTime="1000"
+							splashScreenScaleMode="zoom"
+							>
+
+	<fx:Style source="styles/MainStyle.css"/>
+	<fx:Script>
+		<![CDATA[
+			import Utils.KeyManager;
+			import Utils.TagManager;
+			
+			import adobe.utils.CustomActions;
+			
+			import com.squidzoo.eventSystem.EventCentral;
+			import com.squidzoo.eventSystem.events.CustomEvent;
+			
+			import mx.events.FlexEvent;
+			
+			import views.AuthView;
+			import views.SnippetListView;
+			
+			private var tagManager:TagManager;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void
+			{
+				if(KeyManager.isValid()=="true"){
+					navigator.pushView(views.SnippetListView);	
+				}else{
+					navigator.pushView(views.AuthView);
+				}
+				
+				tagManager = new TagManager();
+				
+				EventCentral.getInstance().addEventListener(CustomEvent.ABOUT_SELECTED,onAboutSelected);
+				EventCentral.getInstance().addEventListener(CustomEvent.NEW_KEY_SELECTED,onNewKeySelected);
+				EventCentral.getInstance().addEventListener(CustomEvent.VIEW_SNIPPETS,onViewSnippets);
+			}
+			
+			protected function onAboutSelected(event:Event):void
+			{
+				navigator.pushView(views.AboutView);	
+			}
+			
+			protected function onNewKeySelected(event:Event):void
+			{
+				navigator.pushView(views.AuthView);
+			}
+			
+			protected function onViewSnippets(event:Event):void
+			{
+				navigator.pushView(views.SnippetListView)			
+			}
+			
+		]]>
+	</fx:Script>
+
+</s:ViewNavigatorApplication>

@@ -1,0 +1,166 @@
+<!--
+*******************************************************************************
+* Copyright 2011, 2012 Gunnar Karlsson.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************
+-->
+
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark"
+		creationComplete="creationCompleteHandler(event)">
+
+	<fx:Script>
+		<![CDATA[
+			import Utils.KeyManager;
+
+			import VOs.SnippetVO;
+
+			import com.mattism.http.xmlrpc.ConnectionImpl;
+			import com.mattism.http.xmlrpc.MethodFault;
+			import com.mattism.http.xmlrpc.util.*;
+			import com.squidzoo.eventSystem.EventCentral;
+			import com.squidzoo.eventSystem.events.CustomDataEvent;
+			import com.squidzoo.eventSystem.events.CustomEvent;
+
+			import components.MenuPopUp;
+
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.utils.ArrayUtil;
+
+			[Bindable]
+			private var popup:MenuPopUp;
+
+			private var _rpc:ConnectionImpl;
+			[Bindable]
+			private var _irLabel:String="snippet";
+
+			[Bindable]
+			private var _snippetVOs:ArrayCollection=new ArrayCollection(new Array());
+
+			[Bindable]
+			private var _completeSnippetVOs:ArrayCollection=new ArrayCollection(new Array());
+
+			private var _totalNumSnippets:int;
+			private var _numSnipppetsProcessed:int;
+
+			private var _timer:Timer;
+
+			private function onClickRefresh():void
+			{
+				init();
+			}
+
+			private function creationCompleteHandler(event:FlexEvent=null):void
+			{
+				init();
+			}
+
+
+			private function init():void
+			{
+				popup=new MenuPopUp();
+
+				_snippetVOs.removeAll();
+
+				var key:String=KeyManager.getKey();
+
+				_rpc=new ConnectionImpl('http://snipplr.com/xml-rpc.php');
+				_rpc.addEventListener(Event.COMPLETE, rpcSnippetListCompleteHandler);
+				_rpc.addEventListener(ErrorEvent.ERROR, rpcSnippetListErrorHandler);
+
+				_rpc.addParam(key, XMLRPCDataTypes.STRING);
+				_rpc.call('snippet.list');
+
+			}
+
+			private function rpcSnippetListCompleteHandler(evt:Event):void
+			{
+				var response:Object=_rpc.getResponse();
+				var snippetListFromSnipplr:Array=ArrayUtil.toArray(response);
+
+				for (var i:int=0; i < snippetListFromSnipplr.length; i++)
+				{
+					var obj:Object=snippetListFromSnipplr[i];
+					var vo:SnippetVO=new SnippetVO();
+					vo.id=obj.id;
+					vo.title=obj.title;
+					_snippetVOs.addItem(vo);
+				}
+
+				getTags();
+			}
+
+			private function getTags():void
+			{
+				_timer=new Timer(1000, _snippetVOs.length);
+				_timer.addEventListener(TimerEvent.TIMER, onTimer);
+				_timer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete);
+				_timer.start();
+			}
+
+
+			private function onTimer(event:TimerEvent):void
+			{
+
+				_totalNumSnippets=_snippetVOs.length;
+
+				for (var i:int=0; i < _snippetVOs.length; i++)
+				{
+					var snippetId:String=_snippetVOs[i].id;
+
+					_rpc=new ConnectionImpl('http://snipplr.com/xml-rpc.php');
+					_rpc.addEventListener(Event.COMPLETE, rpcGetCompleteSnippetHandler);
+					_rpc.addEventListener(ErrorEvent.ERROR, rpcGetCompleteSnippetErrorHandler);
+
+					_rpc.addParam(snippetId, XMLRPCDataTypes.STRING);
+					_rpc.call('snippet.get');
+				}
+			}
+
+			private function rpcGetCompleteSnippetHandler(evt:Event):void
+			{
+				_numSnipppetsProcessed++;
+
+				var response:Object=_rpc.getResponse();
+				if (response)
+				{
+					var vo:SnippetVO=new SnippetVO();
+					vo.id=response.id;
+					vo.title=response.title;
+					vo.tags=response.tags;
+					_completeSnippetVOs.addItem(vo);
+				}
+
+			}
+
+			private function rpcSnippetListErrorHandler(evt:ErrorEvent):void
+			{
+				var fault:MethodFault=_rpc.getFault();
+			}
+
+			private function rpcGetCompleteSnippetErrorHandler(evt:ErrorEvent):void
+			{
+				_numSnipppetsProcessed++;
+			}
+
+			protected function onTimerComplete(event:TimerEvent):void
+			{
+				_timer.removeEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete);
+			}
+		]]>
+	</fx:Script>
+
+</s:View>

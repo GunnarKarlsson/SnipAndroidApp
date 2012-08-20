@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+*******************************************************************************
+* Copyright 2011, 2012 Gunnar Karlsson.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*******************************************************************************
+-->
+
+<s:SkinnablePopUpContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+						   xmlns:s="library://ns.adobe.com/flex/spark"
+						   xmlns:components="components.*"
+						   skinClass="skins.GreenBoxPopupSkin">
+	<fx:Script>
+		<![CDATA[
+			import com.squidzoo.eventSystem.EventCentral;
+			import com.squidzoo.eventSystem.events.CustomEvent;
+
+			import spark.components.View;
+			import mx.core.FlexGlobals;
+
+			private var activeView:View;
+
+			public function show():void
+			{
+				activeView=FlexGlobals.topLevelApplication.navigator.activeView;
+
+				this.center();
+				this.open(activeView, true);
+			}
+
+			public function center():void
+			{
+				this.width=315; //activeView.width * 0.7;
+				this.height=320; //activeView.height * 0.6;
+
+				var newX:Number=(activeView.width / 2) - (this.width / 2);
+				var newY:Number=(activeView.height / 2) - (this.height / 2);
+
+				this.x=newX;
+				this.y=newY;
+			}
+
+			private function onClick(event:MouseEvent):void
+			{
+
+				switch (event.target.id)
+				{
+					case "snippets":
+						EventCentral.getInstance().dispatchEvent(new CustomEvent(CustomEvent.VIEW_SNIPPETS));
+						break;
+					case "newKey":
+						EventCentral.getInstance().dispatchEvent(new CustomEvent(CustomEvent.NEW_KEY_SELECTED));
+						break;
+					case "about":
+						EventCentral.getInstance().dispatchEvent(new CustomEvent(CustomEvent.ABOUT_SELECTED));
+						break;
+				}
+
+				this.close();
+			}
+		]]>
+	</fx:Script>
+
+	<s:Image id="closeX"
+			 x="260"
+			 y="50"
+			 source="@Embed('assets/images/closeRed.png')"
+			 click="this.close()"/>
+
+	<s:VGroup x="6"
+			  y="105">
+
+		<components:IconButton id="snippets"
+							   width="300"
+							   height="80"
+							   icon="@Embed('assets/images/rightArrowSquareLetterPressed.png')"
+							   label="your snippets"
+							   click="onClick(event)"/>
+
+		<components:IconButton id="newKey"
+							   width="300"
+							   height="80"
+							   icon="@Embed('assets/images/rightArrowSquareLetterPressed.png')"
+							   label="change key"
+							   click="onClick(event)"/>
+
+		<components:IconButton id="about"
+							   width="300"
+							   height="80"
+							   icon="@Embed('assets/images/rightArrowSquareLetterPressed.png')"
+							   label="about SNIP"
+							   click="onClick(event)"/>
+
+	</s:VGroup>
+
+
+</s:SkinnablePopUpContainer>
