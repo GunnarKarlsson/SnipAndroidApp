@@ -9,6 +9,8 @@ This project aims to provide an Android client for the snipplr.com website. Snip
  * Choose between small, medium or large font size.
  * Switch to white text on black background for extra contrast.
 
+![Screen shots](https://github.com/GunnarKarlsson/Snip/screenShotPanel.png)
+
 ## Background
 
 Snip was launched on Google Play (then Android Market) in September 2011. It was open-sourced in August 2012.
