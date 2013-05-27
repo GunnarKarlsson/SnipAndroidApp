@@ -23,7 +23,9 @@ To use Snip, you need an account with Snipplr.com. When you start Snip for the f
 
 ## License
 
-    Copyright 2011, 2012 Gunnar Karlsson
+	Source code:
+
+    Copyright © 2011 - 2013 Gunnar Karlsson
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -37,8 +39,11 @@ To use Snip, you need an account with Snipplr.com. When you start Snip for the f
     See the License for the specific language governing permissions and
     limitations under the License.
     
-    .png files are Copyright Gunnar Karlsson and are not covered by the Apache License.
+    Artwork:
+    
+    Copyright © 2011 - 2013 Gunnar Karlsson. Artwork files are not covered by the Apache License.
        
+    ---
     
     ak33m.rpc library Copyright (c) 2007, Akeem Philbert (based on the work of (between others): Jesse Warden, Xavi Beumala, Renaun 
 	Erickson, Carlos Rovira)
