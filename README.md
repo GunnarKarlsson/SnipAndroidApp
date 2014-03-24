@@ -15,8 +15,6 @@ This project aims to provide an Android client for the snipplr.com website. Snip
 
 Snip was launched on Google Play (then Android Market) in September 2011. It was open-sourced in August 2012.
 
-[![Get it on Google Play](http://www.android.com/images/brand/get_it_on_play_logo_small.png)](http://play.google.com/store/apps/details?id=air.com.squidzoo.snip)
-
 ## Installation:
 To use Snip, you need an account with Snipplr.com. When you start Snip for the first time, you will be asked to enter your API key. You can find the API key on your settings page at Snipplr.com.
 
