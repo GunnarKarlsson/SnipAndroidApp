@@ -13,7 +13,7 @@ This project aims to provide an Android client for the snipplr.com website. Snip
 
 ## Background
 
-Snip was launched on Google Play (then Android Market) in September 2011. It was open-sourced in August 2012.
+Snip was created using Adobe AIR and Flex for Android. It was launched on Google Play (then Android Market) in September 2011 and open-sourced in August 2012.
 
 ## Installation:
 To use Snip, you need an account with Snipplr.com. When you start Snip for the first time, you will be asked to enter your API key. You can find the API key on your settings page at Snipplr.com.
