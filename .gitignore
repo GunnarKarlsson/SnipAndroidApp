@@ -1,0 +1,35 @@
+# Flex / AIR build output
+bin/
+bin-debug/
+bin-release/
+[Oo]bj/
+
+# Compiled and packaged artifacts
+*.swf
+*.swc
+*.air
+*.ipa
+*.apk
+*.aab
+
+# Logs
+*.log
+
+# IntelliJ / Android Studio
+*.iml
+.idea/
+
+# Local / generated
+local.properties
+captures/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
